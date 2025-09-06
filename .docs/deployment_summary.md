@@ -34,20 +34,33 @@ The MetaSoft Letterhead Generator uses a simple, focused deployment approach tha
 4. **Create Database** in Hostinger MySQL panel
 5. **Configure Environment** (.env file)
 
-### Step 2: Deploy
-1. **Push code to GitHub** - Hostinger automatically pulls changes
-2. **Run deployment script**:
+### Step 2: Setup Automatic Deployment (One-time)
+1. **SSH into your Hostinger server**
+2. **Navigate to your project directory**
+3. **Run the setup script**:
    ```bash
-   ./scripts/deploy.sh
+   ./scripts/setup-auto-deploy.sh
    ```
 
-That's it! Simple and effective.
+### Step 3: Deploy (Fully Automatic!)
+1. **Push code to GitHub** - Hostinger automatically pulls changes
+2. **Git hook automatically runs** - Laravel deployment happens automatically
+3. **Done!** - Your app is deployed and optimized
+
+That's it! Push and it deploys automatically.
 
 ---
 
 ## 📝 Deployment Script Details
 
 The `scripts/deploy.sh` script performs these Laravel-specific tasks:
+
+### ⚙️ Environment Setup
+```bash
+# Copy .env.example to .env if .env doesn't exist
+cp .env.example .env
+php artisan key:generate --force
+```
 
 ### 🧹 Cache Management
 ```bash
@@ -82,7 +95,16 @@ php artisan view:cache
 
 ## 🔧 Usage Commands
 
-### Deploy After Code Push
+### Automatic Deployment (Recommended)
+```bash
+# One-time setup:
+./scripts/setup-auto-deploy.sh
+
+# Then just push to GitHub - deployment happens automatically!
+git push origin main
+```
+
+### Manual Deployment (if needed)
 ```bash
 # SSH into your Hostinger server, then:
 cd /home/your-username/public_html
@@ -112,10 +134,14 @@ php artisan migrate --force
 - [ ] .env file configured with database credentials
 - [ ] Domain pointed to public_html
 
-### Each Deployment
+### Auto-Deployment Setup
+- [ ] Run `./scripts/setup-auto-deploy.sh` once on server
+- [ ] Verify Git hook is installed properly
+
+### Each Deployment (Automatic)
 - [ ] Push code to GitHub main branch
-- [ ] SSH into Hostinger server
-- [ ] Run `./scripts/deploy.sh`
+- [ ] Git hook automatically deploys
+- [ ] Check deployment.log for status
 - [ ] Test the application
 
 ### Verification

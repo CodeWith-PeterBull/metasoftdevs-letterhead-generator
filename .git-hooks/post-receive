@@ -1,0 +1,55 @@
+#!/bin/bash
+
+##
+# Git Post-Receive Hook for Hostinger
+# 
+# This hook automatically runs the Laravel deployment script after
+# Hostinger's Git integration pulls changes from the repository.
+#
+# Installation on Hostinger:
+# 1. SSH into your Hostinger server
+# 2. Navigate to your git repository directory
+# 3. Copy this file to .git/hooks/post-receive
+# 4. Make it executable: chmod +x .git/hooks/post-receive
+#
+# @author      Metasoftdevs <info@metasoftdevs.com>
+# @version     1.0.0
+##
+
+# Get the current working directory (should be the repo root)
+REPO_DIR=$(pwd)
+DEPLOY_SCRIPT="$REPO_DIR/scripts/deploy.sh"
+
+# Log file for hook execution
+HOOK_LOG="$REPO_DIR/deployment.log"
+
+# Function to log with timestamp
+log_hook() {
+    local message="$1"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] POST-RECEIVE: $message" >> "$HOOK_LOG"
+    echo "POST-RECEIVE: $message"
+}
+
+log_hook "Git post-receive hook triggered"
+log_hook "Repository directory: $REPO_DIR"
+
+# Check if deployment script exists
+if [ ! -f "$DEPLOY_SCRIPT" ]; then
+    log_hook "ERROR: Deployment script not found at $DEPLOY_SCRIPT"
+    exit 1
+fi
+
+# Make sure deployment script is executable
+chmod +x "$DEPLOY_SCRIPT"
+
+# Run the deployment script
+log_hook "Starting automated deployment..."
+
+if "$DEPLOY_SCRIPT" >> "$HOOK_LOG" 2>&1; then
+    log_hook "SUCCESS: Automated deployment completed successfully"
+else
+    log_hook "ERROR: Automated deployment failed"
+    exit 1
+fi
+
+log_hook "Post-receive hook completed"

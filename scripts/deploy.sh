@@ -46,7 +46,21 @@ log() {
 deploy() {
     log "INFO" "🚀 Starting Laravel deployment process..."
     
-    # Step 1: Clear Laravel caches
+    # Step 1: Set up environment file
+    log "INFO" "⚙️ Setting up environment file..."
+    if [ ! -f ".env" ]; then
+        if [ -f ".env.example" ]; then
+            cp .env.example .env
+            log "SUCCESS" "Environment file created from .env.example"
+        else
+            log "ERROR" ".env.example file not found"
+            exit 1
+        fi
+    else
+        log "INFO" "Environment file already exists"
+    fi
+    
+    # Step 2: Clear Laravel caches
     log "INFO" "🧹 Clearing Laravel caches..."
     php artisan config:clear || log "WARN" "Config clear failed (might not exist)"
     php artisan cache:clear || log "WARN" "Cache clear failed (might not exist)" 
@@ -54,7 +68,7 @@ deploy() {
     php artisan route:clear || log "WARN" "Route clear failed (might not exist)"
     log "SUCCESS" "Caches cleared"
     
-    # Step 2: Install Composer dependencies
+    # Step 3: Install Composer dependencies
     log "INFO" "📦 Installing Composer dependencies..."
     composer install --no-dev --optimize-autoloader --no-interaction
     if [ $? -eq 0 ]; then
@@ -64,7 +78,7 @@ deploy() {
         exit 1
     fi
     
-    # Step 3: Install NPM dependencies and build assets
+    # Step 4: Install NPM dependencies and build assets
     log "INFO" "📦 Installing NPM dependencies..."
     npm ci --production
     if [ $? -eq 0 ]; then
@@ -81,7 +95,7 @@ deploy() {
         log "WARN" "Asset build failed, continuing anyway"
     fi
     
-    # Step 4: Generate application key if needed
+    # Step 5: Generate application key if needed
     if ! grep -q "APP_KEY=base64:" .env 2>/dev/null; then
         log "INFO" "🔑 Generating application key..."
         php artisan key:generate --force
@@ -90,7 +104,7 @@ deploy() {
         log "INFO" "Application key already exists"
     fi
     
-    # Step 5: Run database migrations
+    # Step 6: Run database migrations
     log "INFO" "🗄️ Running database migrations..."
     php artisan migrate --force
     if [ $? -eq 0 ]; then
@@ -99,7 +113,7 @@ deploy() {
         log "WARN" "Database migrations failed (might be expected)"
     fi
     
-    # Step 6: Seed database (only if needed)
+    # Step 7: Seed database (only if needed)
     log "INFO" "🌱 Seeding database..."
     php artisan db:seed --force --class=DatabaseSeeder
     if [ $? -eq 0 ]; then
@@ -108,14 +122,14 @@ deploy() {
         log "WARN" "Database seeding failed or skipped"
     fi
     
-    # Step 7: Fix file permissions
+    # Step 8: Fix file permissions
     log "INFO" "🔐 Setting file permissions..."
     chmod -R 755 storage bootstrap/cache 2>/dev/null || log "WARN" "Permission setting failed"
     find storage -type f -exec chmod 644 {} \; 2>/dev/null || log "WARN" "Storage file permissions failed"
     find bootstrap/cache -type f -exec chmod 644 {} \; 2>/dev/null || log "WARN" "Cache file permissions failed"
     log "SUCCESS" "File permissions set"
     
-    # Step 8: Optimize Laravel for production
+    # Step 9: Optimize Laravel for production
     log "INFO" "⚡ Optimizing Laravel for production..."
     php artisan config:cache
     php artisan route:cache  
@@ -127,7 +141,7 @@ deploy() {
         log "WARN" "Laravel optimization had issues"
     fi
     
-    # Step 9: Final health check
+    # Step 10: Final health check
     log "INFO" "🏥 Running health check..."
     if php artisan about --only=environment >/dev/null 2>&1; then
         log "SUCCESS" "Health check passed"
