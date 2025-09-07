@@ -416,18 +416,50 @@ Sincerely,
                 // Wait for all scripts to load
                 setTimeout(function() {
                     console.log('Checking Summernote availability...');
+                    console.log('jQuery available:', typeof $ !== 'undefined');
+                    console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
                     console.log('Summernote plugin:', typeof $.fn.summernote !== 'undefined' ? 'Available' : 'Not available');
+                    console.log('Summernote version:', $.fn.summernote ? $.fn.summernote.version : 'N/A');
                     
                     if (typeof $.fn.summernote !== 'undefined') {
                         console.log('Initializing Summernote...');
                         
-                        // Basic Summernote initialization
+                        // Enhanced Summernote initialization with full features
                         $('#letter_content').summernote({
                             height: 300,
                             placeholder: 'Enter your letter content here...',
+                            tabsize: 2,
+                            focus: false,
+                            toolbar: [
+                                ['style', ['style']],
+                                ['font', ['bold', 'italic', 'underline', 'clear']],
+                                ['fontname', ['fontname']],
+                                ['fontsize', ['fontsize']],
+                                ['color', ['color']],
+                                ['para', ['ul', 'ol', 'paragraph']],
+                                ['table', ['table']],
+                                ['insert', ['link', 'picture', 'hr']],
+                                ['view', ['fullscreen', 'codeview', 'help']]
+                            ],
+                            fontNames: [
+                                'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New',
+                                'Helvetica Neue', 'Helvetica', 'Impact', 'Lucida Grande', 'Tahoma', 
+                                'Times New Roman', 'Verdana', 'Georgia', 'Trebuchet MS'
+                            ],
+                            fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30', '32', '36', '40', '44', '48', '54', '60', '66', '72', '80'],
+                            lineHeights: ['0.2', '0.3', '0.4', '0.5', '0.6', '0.8', '1.0', '1.2', '1.4', '1.5', '2.0', '3.0'],
+                            styleTags: [
+                                'p',
+                                { title: 'Blockquote', tag: 'blockquote', className: 'blockquote', value: 'blockquote' },
+                                'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+                            ],
                             callbacks: {
                                 onInit: function() {
-                                    console.log('✅ Summernote initialized successfully!');
+                                    console.log('✅ Enhanced Summernote initialized successfully!');
+                                    console.log('Toolbar buttons:', $('.note-toolbar .btn').length);
+                                },
+                                onChange: function(contents, $editable) {
+                                    console.log('Content changed');
                                 }
                             }
                         });
@@ -455,7 +487,26 @@ Sincerely,
                     console.log('Attempting fallback initialization...');
                     $('#letter_content').summernote({
                         height: 300,
-                        placeholder: 'Enter your letter content here...'
+                        placeholder: 'Enter your letter content here...',
+                        tabsize: 2,
+                        focus: false,
+                        toolbar: [
+                            ['style', ['style']],
+                            ['font', ['bold', 'italic', 'underline', 'clear']],
+                            ['fontname', ['fontname']],
+                            ['fontsize', ['fontsize']],
+                            ['color', ['color']],
+                            ['para', ['ul', 'ol', 'paragraph']],
+                            ['table', ['table']],
+                            ['insert', ['link', 'picture', 'hr']],
+                            ['view', ['fullscreen', 'codeview', 'help']]
+                        ],
+                        fontNames: [
+                            'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New',
+                            'Helvetica Neue', 'Helvetica', 'Impact', 'Lucida Grande', 'Tahoma', 
+                            'Times New Roman', 'Verdana', 'Georgia', 'Trebuchet MS'
+                        ],
+                        fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30', '32', '36', '40', '44', '48', '54', '60', '66', '72', '80']
                     });
                 }
             });

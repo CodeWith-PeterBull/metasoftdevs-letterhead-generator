@@ -721,16 +721,61 @@ class LetterheadTemplateService
         // Convert HTML content to Word-compatible format
         $content = $htmlContent;
         
+        // Handle tables first (before other processing)
+        if (preg_match_all('/<table[^>]*>(.*?)<\/table>/is', $content, $tableMatches)) {
+            foreach ($tableMatches[0] as $index => $fullTableHtml) {
+                $tableContent = $tableMatches[1][$index];
+                $tableId = "TABLE_PLACEHOLDER_" . $index;
+                $content = str_replace($fullTableHtml, $tableId, $content);
+                
+                // Process the table after main content
+                $section->addTextBreak();
+                self::addTableToSection($section, $tableContent);
+                $section->addTextBreak();
+                
+                // Replace the placeholder with empty string
+                $content = str_replace($tableId, '', $content);
+            }
+        }
+        
         // Replace HTML line breaks with newlines
         $content = preg_replace('/<br\s*\/?>/i', "\n", $content);
         $content = preg_replace('/<\/p>\s*<p[^>]*>/i', "\n\n", $content);
         $content = str_replace(['</p>', '<p>', '<p>'], ["\n", '', ''], $content);
         
-        // Handle lists
-        $content = preg_replace('/<\/li>\s*<li[^>]*>/i', "\n• ", $content);
-        $content = preg_replace('/<li[^>]*>/i', "• ", $content);
-        $content = preg_replace('/<\/li>/i', "", $content);
-        $content = preg_replace('/<\/?[uo]l[^>]*>/i', "\n", $content);
+        // Handle ordered lists (numbered)
+        if (preg_match_all('/<ol[^>]*>(.*?)<\/ol>/is', $content, $olMatches)) {
+            foreach ($olMatches[0] as $index => $fullListHtml) {
+                $listContent = $olMatches[1][$index];
+                $listId = "OL_PLACEHOLDER_" . $index;
+                $content = str_replace($fullListHtml, $listId, $content);
+                
+                // Process ordered list items
+                preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $listContent, $liMatches);
+                $listItems = [];
+                foreach ($liMatches[1] as $liIndex => $liContent) {
+                    $listItems[] = ($liIndex + 1) . ". " . strip_tags(trim($liContent));
+                }
+                $content = str_replace($listId, "\n" . implode("\n", $listItems) . "\n", $content);
+            }
+        }
+        
+        // Handle unordered lists (bulleted)
+        if (preg_match_all('/<ul[^>]*>(.*?)<\/ul>/is', $content, $ulMatches)) {
+            foreach ($ulMatches[0] as $index => $fullListHtml) {
+                $listContent = $ulMatches[1][$index];
+                $listId = "UL_PLACEHOLDER_" . $index;
+                $content = str_replace($fullListHtml, $listId, $content);
+                
+                // Process unordered list items
+                preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $listContent, $liMatches);
+                $listItems = [];
+                foreach ($liMatches[1] as $liContent) {
+                    $listItems[] = "• " . strip_tags(trim($liContent));
+                }
+                $content = str_replace($listId, "\n" . implode("\n", $listItems) . "\n", $content);
+            }
+        }
         
         // Handle divs as paragraphs
         $content = preg_replace('/<\/div>\s*<div[^>]*>/i', "\n", $content);
@@ -763,6 +808,75 @@ class LetterheadTemplateService
                 }
             }
             $section->addTextBreak();
+        }
+    }
+    
+    private static function addTableToSection($section, string $tableHtml): void
+    {
+        // Parse table content
+        preg_match_all('/<tr[^>]*>(.*?)<\/tr>/is', $tableHtml, $rowMatches);
+        
+        if (empty($rowMatches[1])) {
+            return;
+        }
+        
+        $tableData = [];
+        $maxCols = 0;
+        
+        // Parse rows and cells
+        foreach ($rowMatches[1] as $rowHtml) {
+            preg_match_all('/<t[hd][^>]*>(.*?)<\/t[hd]>/is', $rowHtml, $cellMatches);
+            $row = [];
+            foreach ($cellMatches[1] as $cellHtml) {
+                $row[] = trim(strip_tags($cellHtml));
+            }
+            if (!empty($row)) {
+                $tableData[] = $row;
+                $maxCols = max($maxCols, count($row));
+            }
+        }
+        
+        if (empty($tableData) || $maxCols == 0) {
+            return;
+        }
+        
+        // Create table in Word document
+        $table = $section->addTable([
+            'borderSize' => 6,
+            'borderColor' => '333333',
+            'cellMargin' => 80,
+            'width' => 5000 // Full width in twips
+        ]);
+        
+        foreach ($tableData as $rowIndex => $rowData) {
+            $table->addRow();
+            
+            // Pad row to max columns
+            while (count($rowData) < $maxCols) {
+                $rowData[] = '';
+            }
+            
+            foreach ($rowData as $colIndex => $cellData) {
+                // Calculate cell width in twips (equal distribution)
+                $cellWidth = floor(5000 / $maxCols);
+                
+                $cellStyle = [
+                    'valign' => 'top',
+                    'width' => $cellWidth
+                ];
+                
+                // Header row styling
+                if ($rowIndex === 0) {
+                    $cellStyle['bgColor'] = 'F5F5F5';
+                }
+                
+                $cell = $table->addCell($cellWidth, $cellStyle);
+                $cell->addText($cellData, [
+                    'name' => 'Arial',
+                    'size' => 10,
+                    'bold' => $rowIndex === 0
+                ]);
+            }
         }
     }
     

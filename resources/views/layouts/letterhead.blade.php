@@ -15,9 +15,159 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         
         <!-- Summernote CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.9.1/summernote-bs5.min.css" rel="stylesheet">
         <!-- Summernote CSS fallback -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs5.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.css" rel="stylesheet">
+        
+        <!-- Custom CSS for better Summernote display -->
+        <style>
+            /* Enhanced list display in Summernote editor */
+            .note-editable ul, .note-editable ol {
+                margin: 12px 0 !important;
+                padding-left: 30px !important;
+            }
+            
+            .note-editable ul li {
+                list-style-type: disc !important;
+                margin-bottom: 6px !important;
+                display: list-item !important;
+            }
+            
+            .note-editable ol li {
+                list-style-type: decimal !important;
+                margin-bottom: 6px !important;
+                display: list-item !important;
+            }
+            
+            .note-editable ul ul li {
+                list-style-type: circle !important;
+            }
+            
+            .note-editable ol ol li {
+                list-style-type: lower-alpha !important;
+            }
+            
+            /* Enhanced table display in Summernote editor */
+            .note-editable table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+                margin: 12px 0 !important;
+                border: 1px solid #333 !important;
+                table-layout: fixed !important;
+            }
+            
+            .note-editable table th,
+            .note-editable table td {
+                border-right: 1px solid #333 !important;
+                border-bottom: 1px solid #333 !important;
+                padding: 8px 12px !important;
+                text-align: left !important;
+                vertical-align: top !important;
+                word-wrap: break-word !important;
+            }
+            
+            .note-editable table th:last-child,
+            .note-editable table td:last-child {
+                border-right: none !important;
+            }
+            
+            .note-editable table tr:last-child th,
+            .note-editable table tr:last-child td {
+                border-bottom: none !important;
+            }
+            
+            .note-editable table th {
+                background-color: #f8f9fa !important;
+                font-weight: 600 !important;
+            }
+            
+            .note-editable table tr:nth-child(even) {
+                background-color: #f8f9fa50 !important;
+            }
+            
+            /* Ensure proper spacing around block elements */
+            .note-editable p {
+                margin-bottom: 12px !important;
+            }
+            
+            .note-editable h1, .note-editable h2, .note-editable h3, 
+            .note-editable h4, .note-editable h5, .note-editable h6 {
+                margin-top: 20px !important;
+                margin-bottom: 12px !important;
+            }
+            
+            /* Enhanced toolbar contrast and visibility */
+            .note-toolbar {
+                border-bottom: 2px solid #dee2e6 !important;
+                background-color: #f8f9fa !important;
+                padding: 8px !important;
+            }
+            
+            .note-toolbar .btn {
+                color: #212529 !important;
+                border: 1px solid #dee2e6 !important;
+                background-color: #ffffff !important;
+                margin: 1px !important;
+                font-weight: 500 !important;
+            }
+            
+            .note-toolbar .btn:hover {
+                color: #ffffff !important;
+                background-color: #0d6efd !important;
+                border-color: #0d6efd !important;
+                transform: translateY(-1px) !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+            }
+            
+            .note-toolbar .btn:focus,
+            .note-toolbar .btn:active,
+            .note-toolbar .btn.active {
+                color: #ffffff !important;
+                background-color: #0b5ed7 !important;
+                border-color: #0a58ca !important;
+                box-shadow: 0 0 0 0.2rem rgba(49,132,253,0.25) !important;
+            }
+            
+            .note-toolbar .dropdown-toggle::after {
+                color: #212529 !important;
+                font-weight: bold !important;
+            }
+            
+            .note-toolbar .btn:hover .dropdown-toggle::after {
+                color: #ffffff !important;
+            }
+            
+            /* Dropdown menu styling */
+            .note-toolbar .dropdown-menu {
+                border: 2px solid #dee2e6 !important;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+                background-color: #ffffff !important;
+            }
+            
+            .note-toolbar .dropdown-item {
+                color: #212529 !important;
+                font-weight: 500 !important;
+                padding: 8px 16px !important;
+            }
+            
+            .note-toolbar .dropdown-item:hover,
+            .note-toolbar .dropdown-item:focus {
+                color: #ffffff !important;
+                background-color: #0d6efd !important;
+            }
+            
+            /* Color palette enhancements */
+            .note-color .note-color-palette .note-color-row .note-color-col {
+                border: 2px solid #dee2e6 !important;
+                margin: 2px !important;
+            }
+            
+            .note-color .note-color-palette .note-color-row .note-color-col:hover {
+                transform: scale(1.1) !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+                border-color: #0d6efd !important;
+            }
+        </style>
         
         @stack('styles')
     </head>
@@ -56,12 +206,12 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         
         <!-- Summernote JS with fallback -->
-        <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.9.1/summernote-bs5.min.js"></script>
         <script>
             // Fallback loader for Summernote
             if (typeof $.fn.summernote === 'undefined') {
                 console.log('Primary Summernote CDN failed, loading fallback...');
-                document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-bs5.min.js"><\/script>');
+                document.write('<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.js"><\/script>');
             }
         </script>
         

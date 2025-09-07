@@ -295,7 +295,7 @@ class PdfLetterheadService
             <title>Letterhead - ' . htmlspecialchars($data['company_name']) . '</title>
             <style>
                 @page {
-                    margin: 1.5in 1in;
+                    margin: 5% 7%;
                     size: letter;
                 }
                 
@@ -454,7 +454,7 @@ class PdfLetterheadService
             <title>Letterhead - ' . htmlspecialchars($data['company_name']) . '</title>
             <style>
                 @page {
-                    margin: 1.5in 1in;
+                    margin: 5% 7%;
                     size: letter;
                 }
                 
@@ -613,7 +613,7 @@ class PdfLetterheadService
             <title>Letterhead - ' . htmlspecialchars($data['company_name']) . '</title>
             <style>
                 @page {
-                    margin: 1.5in 1in;
+                    margin: 5% 7%;
                     size: letter;
                 }
                 
@@ -805,9 +805,15 @@ class PdfLetterheadService
         // Bold, italic, underline should already be in HTML format from Summernote
 
         // Handle lists - ensure proper styling
-        $content = str_replace('<ul>', '<ul style="margin: 12pt 0; padding-left: 20pt;">', $content);
-        $content = str_replace('<ol>', '<ol style="margin: 12pt 0; padding-left: 20pt;">', $content);
-        $content = str_replace('<li>', '<li style="margin-bottom: 6pt;">', $content);
+        $content = str_replace('<ul>', '<ul style="margin: 12pt 0; padding-left: 20pt; list-style-type: disc;">', $content);
+        $content = str_replace('<ol>', '<ol style="margin: 12pt 0; padding-left: 20pt; list-style-type: decimal;">', $content);
+        $content = str_replace('<li>', '<li style="margin-bottom: 6pt; display: list-item;">', $content);
+
+        // Handle tables - ensure proper styling and borders
+        $content = str_replace('<table>', '<table style="width: 100%; border-collapse: collapse; margin: 12pt 0; border: 1px solid #333;">', $content);
+        $content = str_replace('<th>', '<th style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 8pt; background-color: #f5f5f5; font-weight: bold; text-align: left;">', $content);
+        $content = str_replace('<td>', '<td style="border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 8pt; text-align: left; vertical-align: top;">', $content);
+        $content = str_replace('<tr>', '<tr>', $content);
 
         // Handle font sizes - convert Summernote font sizes to print-friendly sizes
         $content = preg_replace('/font-size:\s*(\d+)px/i', 'font-size: $1pt', $content);
