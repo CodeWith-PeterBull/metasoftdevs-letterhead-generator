@@ -40,19 +40,29 @@ return [
             'report' => false,
         ],
 
+        // 'public' => [
+        //     'driver'     => 'local',
+        //     'root'       => $useNativeStorage
+        //         // on a "normal" server where you can `php artisan storage:link`
+        //         ? storage_path('app/public')
+        //         // on shared hosting (no symlink)
+        //         : public_path('public'),
+        //     'url'        => env('APP_URL')
+        //         . ($useNativeStorage ? '/storage' : '/'),
+        //     'visibility' => 'public',
+        //     'throw'      => false,
+        //     'report'     => false,
+        // ],
+
         'public' => [
             'driver'     => 'local',
             'root'       => $useNativeStorage
-                // on a "normal" server where you can `php artisan storage:link`
                 ? storage_path('app/public')
-                // on shared hosting (no symlink)
-                : public_path('public'),
-            'url'        => env('APP_URL')
-                . ($useNativeStorage ? '/storage' : '/'),
+                : public_path(),
+            'url'        => env('APP_URL') . ($useNativeStorage ? '/storage' : '/public'),
             'visibility' => 'public',
-            'throw'      => false,
-            'report'     => false,
         ],
+
 
         's3' => [
             'driver' => 's3',
