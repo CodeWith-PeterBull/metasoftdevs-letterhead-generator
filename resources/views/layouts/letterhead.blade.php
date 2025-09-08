@@ -167,9 +167,32 @@
                 box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
                 border-color: #0d6efd !important;
             }
+            
+            /* Logo Layout Stability - Prevent flickering */
+            .application-logo {
+                display: block !important;
+                min-width: 2.25rem !important; /* h-9 equivalent */
+                min-height: 2.25rem !important; /* w-9 equivalent */
+                width: 2.25rem !important;
+                height: 2.25rem !important;
+            }
+            
+            /* Ensure navigation container stability */
+            .shrink-0 {
+                flex-shrink: 0 !important;
+                min-width: fit-content !important;
+            }
+            
+            /* Prevent layout shifts in navigation */
+            nav .flex.items-center {
+                min-height: 4rem !important; /* h-16 equivalent */
+            }
         </style>
         
         @stack('styles')
+        
+        <!-- Vite Scripts for initial stability -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="bg-light">
         <div class="min-h-screen">
@@ -216,8 +239,5 @@
         </script>
         
         @stack('scripts')
-        
-        <!-- Vite Scripts (loaded last to avoid conflicts) -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
     </body>
 </html>

@@ -13,6 +13,22 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Logo Layout Stability -->
+        <style>
+            /* Prevent layout shifts for navigation logo */
+            .application-logo {
+                display: block;
+                min-width: 2.25rem; /* h-9 equivalent */
+                min-height: 2.25rem; /* w-9 equivalent */
+            }
+            
+            /* Ensure smooth rendering on all devices */
+            .shrink-0 {
+                flex-shrink: 0;
+                min-width: fit-content;
+            }
+        </style>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">

@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('letterhead.form') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                        <x-application-logo class="block h-9 w-9 fill-current text-gray-800" />
                     </a>
                 </div>
 
@@ -18,6 +18,12 @@
                             <path d="M6 8h8v1H6V8zm0 2h8v1H6v-1zm0 2h5v1H6v-1z"/>
                         </svg>
                         {{ __('Letterhead Generator') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('companies.index')" :active="request()->routeIs('companies.*')">
+                        <svg class="w-4 h-4 me-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm3 2h2v2H7V6zm0 3h2v2H7V9zm0 3h2v2H7v-2zm3-6h4v2h-4V6zm0 3h4v2h-4V9zm0 3h4v2h-4v-2z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ __('Companies') }}
                     </x-nav-link>
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         <svg class="w-4 h-4 me-2 inline" fill="currentColor" viewBox="0 0 20 20">
@@ -79,6 +85,9 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('letterhead.form')" :active="request()->routeIs('letterhead.*')">
                 {{ __('Letterhead Generator') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('companies.index')" :active="request()->routeIs('companies.*')">
+                {{ __('Companies') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}

@@ -54,6 +54,26 @@
 
                         <form action="{{ route('letterhead.generate') }}" method="POST" enctype="multipart/form-data">
                             @csrf
+                            @if($company)
+                                <input type="hidden" name="company_id" value="{{ $company->id }}">
+                                
+                                <!-- Company Binding Header -->
+                                <div class="alert alert-info mb-4">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-building me-2"></i>
+                                        <div>
+                                            <strong>Generating letterhead for:</strong> {{ $company->name }}
+                                            <div class="small text-muted">Company data will be automatically prefilled below</div>
+                                        </div>
+                                        @if($company->hasMedia('logo'))
+                                            <img src="{{ $company->getFirstMedia('logo')->getUrl() }}" 
+                                                 alt="{{ $company->name }} Logo" 
+                                                 class="ms-auto" 
+                                                 style="height: 40px; max-width: 80px; object-fit: contain;">
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
 
                             <!-- Template Selection -->
                             <div class="mb-4">
@@ -62,7 +82,8 @@
                                     <div class="col-md-6 mb-3">
                                         <div class="card template-option" onclick="selectTemplate('classic')">
                                             <div class="card-body text-center">
-                                                <input type="radio" name="template" id="template_classic" value="classic" checked hidden>
+                                                <input type="radio" name="template" id="template_classic" value="classic" 
+                                                       {{ (!$company || $company->default_template === 'classic' || !$company->default_template) ? 'checked' : '' }} hidden>
                                                 <i class="fas fa-file-alt fa-3x text-secondary mb-2"></i>
                                                 <h6 class="card-title">Classic Business</h6>
                                                 <p class="card-text small">Traditional formal business letterhead</p>
@@ -72,7 +93,8 @@
                                     <div class="col-md-6 mb-3">
                                         <div class="card template-option" onclick="selectTemplate('modern_green')">
                                             <div class="card-body text-center">
-                                                <input type="radio" name="template" id="template_modern_green" value="modern_green" hidden>
+                                                <input type="radio" name="template" id="template_modern_green" value="modern_green" 
+                                                       {{ $company && $company->default_template === 'modern_green' ? 'checked' : '' }} hidden>
                                                 <i class="fas fa-leaf fa-3x text-success mb-2"></i>
                                                 <h6 class="card-title">Modern Green Minimalist</h6>
                                                 <p class="card-text small">Clean modern design with green accents</p>
@@ -82,7 +104,8 @@
                                     <div class="col-md-6 mb-3">
                                         <div class="card template-option" onclick="selectTemplate('corporate_blue')">
                                             <div class="card-body text-center">
-                                                <input type="radio" name="template" id="template_corporate_blue" value="corporate_blue" hidden>
+                                                <input type="radio" name="template" id="template_corporate_blue" value="corporate_blue" 
+                                                       {{ $company && $company->default_template === 'corporate_blue' ? 'checked' : '' }} hidden>
                                                 <i class="fas fa-building fa-3x text-primary mb-2"></i>
                                                 <h6 class="card-title">Corporate Blue</h6>
                                                 <p class="card-text small">Professional blue-themed letterhead</p>
@@ -92,7 +115,8 @@
                                     <div class="col-md-6 mb-3">
                                         <div class="card template-option" onclick="selectTemplate('elegant_gray')">
                                             <div class="card-body text-center">
-                                                <input type="radio" name="template" id="template_elegant_gray" value="elegant_gray" hidden>
+                                                <input type="radio" name="template" id="template_elegant_gray" value="elegant_gray" 
+                                                       {{ $company && $company->default_template === 'elegant_gray' ? 'checked' : '' }} hidden>
                                                 <i class="fas fa-crown fa-3x text-dark mb-2"></i>
                                                 <h6 class="card-title">Elegant Gray</h6>
                                                 <p class="card-text small">Sophisticated gray and black design</p>
@@ -109,7 +133,8 @@
                                     <div class="col-md-3 mb-3">
                                         <div class="card paper-size-option" onclick="selectPaperSize('us_letter')">
                                             <div class="card-body text-center">
-                                                <input type="radio" name="paper_size" id="paper_size_us_letter" value="us_letter" checked hidden>
+                                                <input type="radio" name="paper_size" id="paper_size_us_letter" value="us_letter" 
+                                                       {{ (!$company || $company->default_paper_size === 'us_letter' || !$company->default_paper_size) ? 'checked' : '' }} hidden>
                                                 <i class="fas fa-file fa-2x text-primary mb-2"></i>
                                                 <h6 class="card-title">US Letter</h6>
                                                 <p class="card-text small">8.5" × 11"</p>
@@ -119,7 +144,8 @@
                                     <div class="col-md-3 mb-3">
                                         <div class="card paper-size-option" onclick="selectPaperSize('a4')">
                                             <div class="card-body text-center">
-                                                <input type="radio" name="paper_size" id="paper_size_a4" value="a4" hidden>
+                                                <input type="radio" name="paper_size" id="paper_size_a4" value="a4" 
+                                                       {{ $company && $company->default_paper_size === 'a4' ? 'checked' : '' }} hidden>
                                                 <i class="fas fa-file fa-2x text-success mb-2"></i>
                                                 <h6 class="card-title">A4</h6>
                                                 <p class="card-text small">210 × 297 mm</p>
@@ -129,7 +155,8 @@
                                     <div class="col-md-3 mb-3">
                                         <div class="card paper-size-option" onclick="selectPaperSize('legal')">
                                             <div class="card-body text-center">
-                                                <input type="radio" name="paper_size" id="paper_size_legal" value="legal" hidden>
+                                                <input type="radio" name="paper_size" id="paper_size_legal" value="legal" 
+                                                       {{ $company && $company->default_paper_size === 'legal' ? 'checked' : '' }} hidden>
                                                 <i class="fas fa-file-alt fa-2x text-warning mb-2"></i>
                                                 <h6 class="card-title">Legal</h6>
                                                 <p class="card-text small">8.5" × 14"</p>
@@ -139,7 +166,8 @@
                                     <div class="col-md-3 mb-3">
                                         <div class="card paper-size-option" onclick="selectPaperSize('custom')">
                                             <div class="card-body text-center">
-                                                <input type="radio" name="paper_size" id="paper_size_custom" value="custom" hidden>
+                                                <input type="radio" name="paper_size" id="paper_size_custom" value="custom" 
+                                                       {{ $company && $company->default_paper_size === 'custom' ? 'checked' : '' }} hidden>
                                                 <i class="fas fa-expand-arrows-alt fa-2x text-secondary mb-2"></i>
                                                 <h6 class="card-title">Custom</h6>
                                                 <p class="card-text small">Custom size</p>
@@ -193,23 +221,37 @@
                                     <div class="mb-3">
                                         <label for="company_name" class="form-label">Company Name *</label>
                                         <input type="text" class="form-control" id="company_name" name="company_name"
-                                            value="{{ old('company_name') }}" required>
+                                            value="{{ old('company_name', $companyData['company_name'] ?? '') }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="logo" class="form-label">Company Logo</label>
-                                        <input type="file" class="form-control" id="logo" name="logo"
-                                            accept="image/jpeg,image/png,image/jpg">
-                                        <small class="form-text text-muted">Optional: Upload PNG, JPG, or JPEG (max
-                                            2MB)</small>
+                                        @if($company && $company->hasMedia('logo'))
+                                            <div class="d-flex align-items-center mb-2">
+                                                <img src="{{ $company->getFirstMedia('logo')->getUrl() }}" 
+                                                     alt="{{ $company->name }} Logo" 
+                                                     class="me-2" 
+                                                     style="height: 40px; max-width: 80px; object-fit: contain; border: 1px solid #dee2e6; border-radius: 4px; padding: 2px;">
+                                                <small class="text-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Using company logo
+                                                </small>
+                                            </div>
+                                            <input type="file" class="form-control" id="logo" name="logo"
+                                                accept="image/jpeg,image/png,image/jpg">
+                                            <small class="form-text text-muted">Optional: Upload a different logo to override the company logo</small>
+                                        @else
+                                            <input type="file" class="form-control" id="logo" name="logo"
+                                                accept="image/jpeg,image/png,image/jpg">
+                                            <small class="form-text text-muted">Optional: Upload PNG, JPG, or JPEG (max 2MB)</small>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label for="address" class="form-label">Company Address *</label>
-                                <textarea class="form-control" id="address" name="address" rows="3" required>{{ old('address') }}</textarea>
+                                <textarea class="form-control" id="address" name="address" rows="3" required>{{ old('address', $companyData['address'] ?? '') }}</textarea>
                                 <small class="form-text text-muted">Enter full address (use line breaks for multiple
                                     lines)</small>
                             </div>
@@ -219,21 +261,21 @@
                                     <div class="mb-3">
                                         <label for="phone" class="form-label">Phone Number</label>
                                         <input type="text" class="form-control" id="phone" name="phone"
-                                            value="{{ old('phone') }}">
+                                            value="{{ old('phone', $companyData['phone'] ?? '') }}">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <label for="email" class="form-label">Email Address</label>
                                         <input type="email" class="form-control" id="email" name="email"
-                                            value="{{ old('email') }}">
+                                            value="{{ old('email', $companyData['email'] ?? '') }}">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <label for="website" class="form-label">Website</label>
                                         <input type="url" class="form-control" id="website" name="website"
-                                            value="{{ old('website') }}" placeholder="https://example.com">
+                                            value="{{ old('website', $companyData['website'] ?? '') }}" placeholder="https://example.com">
                                     </div>
                                 </div>
                             </div>
@@ -470,11 +512,27 @@ Sincerely,
                     }
                 }, 500);
 
-                // Initialize template selection
-                $('.template-option').first().addClass('selected');
+                // Initialize template selection based on checked radio button
+                var selectedTemplate = $('input[name="template"]:checked');
+                if (selectedTemplate.length > 0) {
+                    selectedTemplate.closest('.template-option').addClass('selected');
+                } else {
+                    $('.template-option').first().addClass('selected');
+                }
                 
-                // Initialize paper size selection
-                $('.paper-size-option').first().addClass('selected');
+                // Initialize paper size selection based on checked radio button
+                var selectedPaperSize = $('input[name="paper_size"]:checked');
+                if (selectedPaperSize.length > 0) {
+                    selectedPaperSize.closest('.paper-size-option').addClass('selected');
+                    // Show custom dimensions if custom is selected
+                    if (selectedPaperSize.val() === 'custom') {
+                        $('#custom_dimensions').show();
+                        $('#custom_width').prop('required', true);
+                        $('#custom_height').prop('required', true);
+                    }
+                } else {
+                    $('.paper-size-option').first().addClass('selected');
+                }
                 
                 // Initialize format selection
                 $('.format-option').first().addClass('selected');

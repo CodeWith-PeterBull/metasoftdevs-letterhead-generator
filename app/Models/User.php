@@ -4,13 +4,15 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -44,5 +46,29 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the user's companies.
+     */
+    public function companies(): HasMany
+    {
+        return $this->hasMany(Company::class);
+    }
+
+    /**
+     * Get the user's active companies.
+     */
+    public function activeCompanies(): HasMany
+    {
+        return $this->hasMany(Company::class)->where('is_active', true);
+    }
+
+    /**
+     * Get the user's default company.
+     */
+    public function defaultCompany()
+    {
+        return $this->hasMany(Company::class)->where('is_default', true)->where('is_active', true);
     }
 }

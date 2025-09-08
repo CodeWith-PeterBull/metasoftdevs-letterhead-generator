@@ -54,6 +54,13 @@ require __DIR__ . '/auth.php';
 
 // Letterhead routes
 Route::middleware('auth')->group(function () {
-    Route::get('/letterhead', [LetterheadController::class, 'showForm'])->name('letterhead.form');
+    Route::get('/letterhead/{company?}', [LetterheadController::class, 'showForm'])->name('letterhead.form');
     Route::post('/letterhead/generate', [LetterheadController::class, 'generateLetterhead'])->name('letterhead.generate');
+});
+
+// Company Management routes
+Route::middleware('auth')->group(function () {
+    Route::get('/companies', function () {
+        return view('companies.index');
+    })->name('companies.index');
 });

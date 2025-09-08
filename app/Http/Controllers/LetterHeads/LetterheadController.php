@@ -36,19 +36,28 @@
 namespace App\Http\Controllers\LetterHeads;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Services\LetterheadTemplateService;
 use App\Services\PdfLetterheadService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpWord\IOFactory;
 
 class LetterheadController extends Controller
 {
-    public function showForm()
+    public function showForm(Company $company = null)
     {
+        // Verify company ownership if company is provided
+        if ($company && $company->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized access to company data.');
+        }
+
         $templates = LetterheadTemplateService::getAvailableTemplates();
-        return view('letterheads.form', compact('templates'));
+        $companyData = $company ? $company->toLetterheadData() : null;
+        
+        return view('letterheads.form', compact('templates', 'company', 'companyData'));
     }
 
     public function generateLetterhead(Request $request)
@@ -69,9 +78,24 @@ class LetterheadController extends Controller
             'custom_width' => 'required_if:paper_size,custom|nullable|numeric|min:1|max:20',
             'custom_height' => 'required_if:paper_size,custom|nullable|numeric|min:1|max:30',
             'output_format' => 'required|string|in:pdf,word',
+            'company_id' => 'nullable|exists:companies,id', // Optional company binding
         ]);
 
         try {
+            // Get company if specified and verify ownership
+            $company = null;
+            if ($request->company_id) {
+                $company = Company::where('id', $request->company_id)
+                    ->where('user_id', Auth::id())
+                    ->first();
+                
+                if (!$company) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->withErrors(['error' => 'Invalid company selection.']);
+                }
+            }
+
             // Prepare data array for template service
             $data = [
                 'company_name' => $request->company_name,
@@ -90,10 +114,24 @@ class LetterheadController extends Controller
                 'logo_path' => null,
             ];
 
-            // Handle logo upload
-            if ($request->hasFile('logo')) {
+            // Track if logo is temporary (needs cleanup)
+            $isTemporaryLogo = false;
+
+            // Handle logo - prioritize company logo, then uploaded file
+            if ($company && $company->hasMedia('logo')) {
+                // Use company logo - this is permanent, don't clean up
+                $data['logo_path'] = $company->getFirstMedia('logo')->getPath();
+                $isTemporaryLogo = false;
+            } elseif ($request->hasFile('logo')) {
+                // Use uploaded logo - this is temporary, needs cleanup
                 $logoPath = $request->file('logo')->store('temp', 'public');
                 $data['logo_path'] = storage_path('app/public/' . $logoPath);
+                $isTemporaryLogo = true;
+            }
+
+            // Update company's last used timestamp if applicable
+            if ($company) {
+                $company->touch();
             }
 
             // Generate letterhead based on selected format
@@ -101,8 +139,8 @@ class LetterheadController extends Controller
                 // Generate PDF letterhead
                 $response = PdfLetterheadService::generateLetterhead($request->template, $data);
 
-                // Clean up temp logo file if it exists
-                if (!empty($data['logo_path']) && file_exists($data['logo_path'])) {
+                // Clean up temp logo file if it exists and is temporary
+                if ($isTemporaryLogo && !empty($data['logo_path']) && file_exists($data['logo_path'])) {
                     register_shutdown_function(function () use ($data) {
                         if (file_exists($data['logo_path'])) {
                             unlink($data['logo_path']);
@@ -124,8 +162,8 @@ class LetterheadController extends Controller
                 // Create writer and return download response
                 $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
 
-                // Clean up temp logo file if it exists
-                if (!empty($data['logo_path']) && file_exists($data['logo_path'])) {
+                // Clean up temp logo file if it exists and is temporary
+                if ($isTemporaryLogo && !empty($data['logo_path']) && file_exists($data['logo_path'])) {
                     register_shutdown_function(function () use ($data) {
                         if (file_exists($data['logo_path'])) {
                             unlink($data['logo_path']);
