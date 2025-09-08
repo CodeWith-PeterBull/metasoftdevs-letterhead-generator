@@ -48,7 +48,7 @@ return [
                 // on shared hosting (no symlink)
                 : public_path('public'),
             'url'        => env('APP_URL')
-                . ($useNativeStorage ? '/storage' : '/public'),
+                . ($useNativeStorage ? '/storage' : '/'),
             'visibility' => 'public',
             'throw'      => false,
             'report'     => false,
