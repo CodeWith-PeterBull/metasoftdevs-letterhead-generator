@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice MSDI 2588</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        
+        .company-info {
+            flex: 1;
+        }
+        
+        .company-info h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .company-info p {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .invoice-details {
+            text-align: right;
+            flex: 1;
+        }
+        
+        .invoice-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .invoice-meta {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .client-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .client-info h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .client-info p {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .services-table th {
+            background-color: #333;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .services-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 12px;
+            vertical-align: top;
+        }
+        
+        .service-number {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .service-description {
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .totals-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .totals-table {
+            width: 300px;
+            margin-left: auto;
+        }
+        
+        .totals-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .totals-table td {
+            padding: 8px 12px;
+            font-size: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .totals-table .label {
+            font-weight: bold;
+            text-align: right;
+        }
+        
+        .totals-table .amount {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .grand-total {
+            background-color: #333;
+            color: white;
+        }
+        
+        .payment-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .payment-info {
+            flex: 1;
+            margin-right: 20px;
+        }
+        
+        .payment-info h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        
+        .payment-info p {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 5px;
+        }
+        
+        .bank-details {
+            flex: 1;
+        }
+        
+        .notes-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .notes-section h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .notes-section p {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="company-info">
+                <h1>MESOFTDEVS</h1>
+                <p>www.mesoftdevs.com<br>
+                info@metasoftdevs.com<br>
+                +254 794 035 976</p>
+            </div>
+            <div class="invoice-details">
+                <div class="invoice-title">INVOICE</div>
+                <div class="invoice-meta">
+                    <strong>Number: MSDI 2588</strong><br>
+                    Update<br>
+                    <strong>Date: 03/06/2025</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Client Information -->
+        <div class="client-info">
+            <h3>TO: REGENT AUCTIONEERS LTD</h3>
+            <p>Nairobi, Kenya Office:<br>
+            New Kireita Hse, Kirinyaga Rd<br>
+            Contact:<br>
+            +254 722 653 332 | +254 722 701 348 |<br>
+            info@regentauctioneers.co.ke</p>
+        </div>
+
+        <!-- Services Table -->
+        <table class="services-table">
+            <thead>
+                <tr>
+                    <th style="width: 60%;">DESCRIPTION</th>
+                    <th style="width: 20%;">SERVICE</th>
+                    <th style="width: 20%;">TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="service-number">1. Website Maintenance (April 2025)</div>
+                        <div class="service-description">Monthly website support, content updates, visual design, and technical maintenance services</div>
+                    </td>
+                    <td></td>
+                    <td style="text-align: right; font-weight: bold;">KSH 4,000.00</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="service-number">2. Website Maintenance (May 2025)</div>
+                        <div class="service-description">Monthly website support, content updates, visual design, and technical maintenance services</div>
+                    </td>
+                    <td></td>
+                    <td style="text-align: right; font-weight: bold;">KSH 4,000.00</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Totals Section -->
+        <div class="totals-section">
+            <div></div>
+            <div class="totals-table">
+                <table>
+                    <tr>
+                        <td class="label">SUB TOTAL</td>
+                        <td class="amount">KSH 8,000.00</td>
+                    </tr>
+                    <tr>
+                        <td class="label">BALANCE</td>
+                        <td class="amount">KSH 8,000.00</td>
+                    </tr>
+                    <tr class="grand-total">
+                        <td class="label">GRAND TOTAL</td>
+                        <td class="amount">KSH 8,000.00</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="payment-section">
+            <div class="payment-info">
+                <h3>PAYABLE TO</h3>
+                <p><strong>Peter Maina</strong><br>
+                +254 794 035 976<br>
+                Peter.metadata@gmail.com</p>
+            </div>
+            <div class="bank-details">
+                <h3>BANK DETAILS</h3>
+                <p><strong>MPESA Account:</strong> 0794 035 976<br>
+                <strong>Holder Name:</strong> Peter Mwangi</p>
+                <p style="margin: 10px 0;"><strong>or</strong></p>
+                <p><strong>KCB Account:</strong> 1276 780 982<br>
+                <strong>Holder Name:</strong> Peter Maina</p>
+            </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="notes-section">
+            <h3>NOTES:</h3>
+            <p>Our team of passionate software developers is dedicated to delivering exceptional service and ensuring seamless, secure, and enjoyable digital experiences. We prioritize customer satisfaction by crafting innovative solutions that meet your needs and exceed expectations.</p>
+        </div>
+    </div>
+</body>
+</html>

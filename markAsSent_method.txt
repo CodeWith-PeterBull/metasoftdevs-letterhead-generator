@@ -1,0 +1,33 @@
+    public function markAsSent(Invoice $invoice): void
+    {
+        try {
+            if ($invoice->user_id !== Auth::id()) {
+                session()->flash("error", "Unauthorized action.");
+                return;
+            }
+
+            if ($invoice->status !== "draft") {
+                session()->flash("error", "Only draft invoices can be marked as sent.");
+                return;
+            }
+
+            $invoice->update([
+                "status" => "sent",
+            ]);
+
+            Log::info("Invoice marked as sent", [
+                "invoice_id" => $invoice->id,
+                "invoice_number" => $invoice->invoice_number,
+                "user_id" => Auth::id(),
+            ]);
+
+            session()->flash("success", "Invoice marked as sent!");
+        } catch (\Exception $e) {
+            Log::error("Failed to mark invoice as sent", [
+                "error" => $e->getMessage(),
+                "invoice_id" => $invoice->id,
+                "user_id" => Auth::id(),
+            ]);
+            session()->flash("error", "Failed to mark invoice as sent. Please try again.");
+        }
+    }

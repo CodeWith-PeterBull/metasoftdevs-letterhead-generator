@@ -2,29 +2,30 @@
 
 /**
  * Web Routes Configuration
- * 
+ *
  * Defines all HTTP routes for the MetaSoft Letterhead Generator application.
  * Includes authentication-protected routes for letterhead generation functionality
  * and standard Laravel authentication routes.
- * 
+ *
  * Route Groups:
  * - Public routes: Welcome page
  * - Authenticated routes: Dashboard, Profile management, Letterhead generation
- * 
+ *
  * Security:
  * - All letterhead routes require authentication
  * - CSRF protection enabled on POST routes
  * - Middleware applied for user verification
- * 
- * @package     MetaSoft Letterhead Generator
+ *
  * @category    Route Configuration
+ *
  * @author      Metasoftdevs <info@metasoftdevs.com>
  * @copyright   2025 Metasoft Developers
  * @license     MIT License
+ *
  * @version     1.0.0
+ *
  * @link        https://www.metasoftdevs.com
  * @since       File available since Release 1.0.0
- * 
  * @see         \App\Http\Controllers\LetterHeads\LetterheadController Main letterhead controller
  * @see         \App\Http\Controllers\ProfileController User profile management
  */
@@ -47,10 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
-
-
-
+require __DIR__.'/auth.php';
 
 // Letterhead routes
 Route::middleware('auth')->group(function () {
@@ -63,4 +61,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/companies', function () {
         return view('companies.index');
     })->name('companies.index');
+});
+
+// Invoice Management routes
+Route::middleware('auth')->group(function () {
+    Route::get('/invoices', function () {
+        return view('invoices.index');
+    })->name('invoices.index');
 });

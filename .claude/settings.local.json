@@ -12,7 +12,9 @@
       "mcp__laravel-boost__tinker",
       "mcp__laravel-boost__search-docs",
       "WebSearch",
-      "Bash(php -l:*)"
+      "Bash(php -l:*)",
+      "Bash(vendor/bin/pint:*)",
+      "Bash(php:*)"
     ],
     "deny": [],
     "ask": []

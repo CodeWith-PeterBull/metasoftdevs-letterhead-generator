@@ -329,7 +329,7 @@ Sincerely,
 
                             <div class="text-center">
                                 <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-download"></i> Generate & Download Letterhead
+                                    <i class="fas fa-download me-2"></i>Generate & Download Letterhead
                                 </button>
                             </div>
                         </form>
