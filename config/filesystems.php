@@ -56,10 +56,8 @@ return [
 
         'public' => [
             'driver'     => 'local',
-            'root'       => $useNativeStorage
-                ? storage_path('app/public')
-                : public_path(),
-            'url'        => env('APP_URL') . ($useNativeStorage ? '/storage' : '/public'),
+            'root'       => $useNativeStorage ? storage_path('app/public') : public_path('custom-storage'),
+            'url'        => env('APP_URL') . ($useNativeStorage ? '/storage' : '/custom-storage'),
             'visibility' => 'public',
         ],
 

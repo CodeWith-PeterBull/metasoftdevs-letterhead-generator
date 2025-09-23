@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Invoice extends Model
 {
@@ -216,7 +217,7 @@ class Invoice extends Model
         $filename = "invoice_{$this->invoice_number}_{$this->id}.pdf";
         $path = "invoices/{$this->user_id}/{$filename}";
 
-        $pdf->save(storage_path("app/public/{$path}"));
+        Storage::disk('public')->put($path, $pdf->output());
 
         $this->update([
             'document_path' => $path,
@@ -275,7 +276,7 @@ class Invoice extends Model
             return null;
         }
 
-        return asset("storage/{$this->document_path}");
+        return Storage::disk('public')->url($this->document_path);
     }
 
     /**
@@ -283,7 +284,7 @@ class Invoice extends Model
      */
     public function hasPdf(): bool
     {
-        return $this->document_path && file_exists(storage_path("app/public/{$this->document_path}"));
+        return $this->document_path && Storage::disk('public')->exists($this->document_path);
     }
 
     /**

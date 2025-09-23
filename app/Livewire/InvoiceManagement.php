@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceTo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -130,7 +131,7 @@ class InvoiceManagement extends Component
 
         if ($lastInvoice && preg_match('/(\d+)$/', $lastInvoice->invoice_number, $matches)) {
             $nextNumber = intval($matches[1]) + 1;
-            $this->invoiceForm['invoice_number'] = 'MSDI '.$nextNumber;
+            $this->invoiceForm['invoice_number'] = 'MSDI ' . $nextNumber;
         } else {
             $this->invoiceForm['invoice_number'] = 'MSDI 1001';
         }
@@ -547,9 +548,9 @@ class InvoiceManagement extends Component
             ->where('user_id', Auth::id())
             ->when($this->searchTerm, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('invoice_number', 'like', '%'.$this->searchTerm.'%')
+                    $q->where('invoice_number', 'like', '%' . $this->searchTerm . '%')
                         ->orWhereHas('invoiceTo', function ($subq) {
-                            $subq->where('company_name', 'like', '%'.$this->searchTerm.'%');
+                            $subq->where('company_name', 'like', '%' . $this->searchTerm . '%');
                         });
                 });
             })
@@ -569,42 +570,39 @@ class InvoiceManagement extends Component
         }
 
         try {
-            // Ensure storage directory exists
-            $userDir = storage_path("app/public/invoices/{$invoice->user_id}");
-            if (! file_exists($userDir)) {
-                mkdir($userDir, 0755, true);
-            }
-
             $path = $invoice->generatePdf();
 
             session()->flash('success', 'Invoice PDF generated successfully!');
             $this->dispatch('pdf-generated', ['path' => $path, 'url' => $invoice->getPdfUrl()]);
-
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to generate PDF: '.$e->getMessage());
+            session()->flash('error', 'Failed to generate PDF: ' . $e->getMessage());
         }
     }
 
-    public function downloadPdf(Invoice $invoice): void
+    public function downloadPdf(Invoice $invoice)
     {
         if ($invoice->user_id !== Auth::id()) {
+            session()->flash('error', 'Unauthorized action.');
+
             return;
         }
 
         try {
             $path = $invoice->getOrGeneratePdf();
-            $fullPath = storage_path("app/public/{$path}");
 
-            if (! file_exists($fullPath)) {
+            if (! Storage::disk('public')->exists($path)) {
                 session()->flash('error', 'PDF file not found. Please generate it again.');
 
                 return;
             }
 
-            $this->dispatch('download-pdf', ['url' => asset("storage/{$path}")]);
+            $filename = "invoice_{$invoice->invoice_number}_{$invoice->id}.pdf";
 
+            return Storage::disk('public')->download($path, $filename);
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to download PDF: '.$e->getMessage());
+            session()->flash('error', 'Failed to download PDF: ' . $e->getMessage());
+
+            return;
         }
     }
 
@@ -616,10 +614,9 @@ class InvoiceManagement extends Component
 
         try {
             $path = $invoice->getOrGeneratePdf();
-            $this->dispatch('view-pdf', ['url' => asset("storage/{$path}")]);
-
+            $this->dispatch('view-pdf', ['url' => Storage::disk('public')->url($path)]);
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to view PDF: '.$e->getMessage());
+            session()->flash('error', 'Failed to view PDF: ' . $e->getMessage());
         }
     }
 }
