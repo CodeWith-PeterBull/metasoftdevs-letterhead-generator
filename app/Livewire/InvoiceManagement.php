@@ -8,6 +8,7 @@ use App\Models\InvoiceTo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -121,6 +122,18 @@ class InvoiceManagement extends Component
         if ($this->companies->isNotEmpty()) {
             $this->invoiceForm['company_id'] = $this->companies->first()->id;
         }
+    }
+
+    #[On('client-saved')]
+    public function refreshClientList(): void
+    {
+        $this->clients = InvoiceTo::where('user_id', Auth::id())->get();
+    }
+
+    #[On('client-deleted')]
+    public function refreshClientListAfterDeletion(): void
+    {
+        $this->clients = InvoiceTo::where('user_id', Auth::id())->get();
     }
 
     public function generateInvoiceNumber(): void

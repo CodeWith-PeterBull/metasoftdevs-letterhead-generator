@@ -119,11 +119,27 @@ class ClientManagement extends Component
     public function deleteClient(InvoiceTo $client): void
     {
         if ($client->user_id !== Auth::id()) {
+            session()->flash('error', 'Unauthorized action.');
             return;
         }
 
-        $client->delete();
-        session()->flash('success', 'Client deleted successfully!');
+        try {
+            // Check if client has associated invoices
+            $invoiceCount = $client->invoices()->count();
+
+            if ($invoiceCount > 0) {
+                session()->flash('error', "Cannot delete client. {$invoiceCount} invoice(s) are associated with this client.");
+                return;
+            }
+
+            $clientName = $client->company_name;
+            $client->delete();
+
+            session()->flash('success', "Client '{$clientName}' deleted successfully!");
+            $this->dispatch('client-deleted');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to delete client. Please try again.');
+        }
     }
 
     public function closeModal(): void
