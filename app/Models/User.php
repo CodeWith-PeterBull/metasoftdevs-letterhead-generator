@@ -12,7 +12,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -70,5 +70,29 @@ class User extends Authenticatable
     public function defaultCompany()
     {
         return $this->hasMany(Company::class)->where('is_default', true)->where('is_active', true);
+    }
+
+    /**
+     * Get the user's document signatures.
+     */
+    public function documentSignatures(): HasMany
+    {
+        return $this->hasMany(DocumentSignature::class);
+    }
+
+    /**
+     * Get the user's active document signatures.
+     */
+    public function activeSignatures(): HasMany
+    {
+        return $this->hasMany(DocumentSignature::class)->where('is_active', true);
+    }
+
+    /**
+     * Get the user's default document signature.
+     */
+    public function defaultSignature()
+    {
+        return $this->hasMany(DocumentSignature::class)->where('is_default', true)->where('is_active', true)->first();
     }
 }

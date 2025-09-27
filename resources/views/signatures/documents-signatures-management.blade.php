@@ -1,6 +1,6 @@
 @extends('layouts.letterhead')
 
-@section('title', 'Invoice Management')
+@section('title', 'Signatures Management')
 
 @section('content')
     <div class="container-fluid mt-4">
@@ -8,7 +8,7 @@
             <div class="col">
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="h4 mb-0">Invoice & Client Management</h2>
+                        <h2 class="h4 mb-0">Document Signatures Management</h2>
                     </div>
                     <div class="card-body p-0">
                         <!-- Bootstrap 5 Tabs with Custom Styling -->
@@ -45,7 +45,7 @@
                         </style>
 
                         <ul class="nav nav-tabs" id="invoiceManagementTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
+                            {{-- <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="invoices-tab" data-bs-toggle="tab"
                                     data-bs-target="#invoices-tabpane" type="button" role="tab"
                                     aria-controls="invoices-tabpane" aria-selected="true">
@@ -58,18 +58,18 @@
                                     aria-controls="clients-tabpane" aria-selected="false">
                                     <i class="fas fa-users me-2"></i>Clients
                                 </button>
-                            </li>
-                            {{-- <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="signatures-tab" data-bs-toggle="tab"
-                                        data-bs-target="#signatures-tabpane" type="button" role="tab"
-                                        aria-controls="signatures-tabpane" aria-selected="false">
+                            </li> --}}
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="signatures-tab" data-bs-toggle="tab"
+                                    data-bs-target="#signatures-tabpane" type="button" role="tab"
+                                    aria-controls="signatures-tabpane" aria-selected="false">
                                     <i class="fas fa-signature me-2"></i>Signatures
                                 </button>
-                            </li> --}}
+                            </li>
                         </ul>
 
                         <div class="tab-content" id="invoiceManagementTabsContent">
-                            <div class="tab-pane fade show active" id="invoices-tabpane" role="tabpanel"
+                            {{-- <div class="tab-pane fade show active" id="invoices-tabpane" role="tabpanel"
                                 aria-labelledby="invoices-tab">
                                 <div class="p-4">
                                     @livewire('invoice-management')
@@ -79,13 +79,13 @@
                                 <div class="p-4">
                                     @livewire('client-management')
                                 </div>
-                            </div>
-                            {{-- <div class="tab-pane fade" id="signatures-tabpane" role="tabpanel"
+                            </div> --}}
+                            <div class="tab-pane fade show active" id="signatures-tabpane" role="tabpanel"
                                 aria-labelledby="signatures-tab">
                                 <div class="p-4">
                                     @livewire('signature-management')
                                 </div>
-                            </div> --}}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -48,7 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 // Letterhead routes
 Route::middleware('auth')->group(function () {
@@ -68,4 +68,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/invoices', function () {
         return view('invoices.index');
     })->name('invoices.index');
+});
+
+// Invoice Management routes
+Route::middleware('auth')->group(function () {
+    Route::get('/signatures', function () {
+        return view('signatures.documents-signatures-management');
+    })->name('signatures.signatures-management');
 });
