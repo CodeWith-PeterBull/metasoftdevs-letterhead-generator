@@ -36,6 +36,7 @@ class InvoiceManagement extends Component
         'tax_amount' => 0,
         'discount_amount' => 0,
         'balance' => 0,
+        'paid_amount' => 0,
         'grand_total' => 0,
         'currency' => 'KSH',
         'status' => 'draft',
@@ -80,6 +81,7 @@ class InvoiceManagement extends Component
             'invoiceForm.invoice_to_id' => 'required|exists:invoice_tos,id',
             'invoiceForm.currency' => 'required|string|max:3',
             'invoiceForm.status' => 'required|in:draft,sent,paid,overdue,cancelled',
+            'invoiceForm.paid_amount' => 'nullable|numeric|min:0',
             'invoiceForm.notes' => 'nullable|string',
             'invoiceForm.internal_notes' => 'nullable|string',
             'items' => 'required|array|min:1',
@@ -144,7 +146,7 @@ class InvoiceManagement extends Component
 
         if ($lastInvoice && preg_match('/(\d+)$/', $lastInvoice->invoice_number, $matches)) {
             $nextNumber = intval($matches[1]) + 1;
-            $this->invoiceForm['invoice_number'] = 'MSDI ' . $nextNumber;
+            $this->invoiceForm['invoice_number'] = 'MSDI '.$nextNumber;
         } else {
             $this->invoiceForm['invoice_number'] = 'MSDI 1001';
         }
@@ -197,6 +199,7 @@ class InvoiceManagement extends Component
             'tax_amount' => $invoice->tax_amount,
             'discount_amount' => $invoice->discount_amount,
             'balance' => $invoice->balance,
+            'paid_amount' => $invoice->paid_amount,
             'grand_total' => $invoice->grand_total,
             'currency' => $invoice->currency,
             'status' => $invoice->status,
@@ -224,6 +227,13 @@ class InvoiceManagement extends Component
     {
         try {
             $this->validate($this->getInvoiceValidationRules());
+
+            // Additional validation: paid_amount cannot exceed grand_total
+            if ($this->invoiceForm['paid_amount'] > $this->invoiceForm['grand_total']) {
+                $this->addError('invoiceForm.paid_amount', 'Paid amount cannot exceed the grand total.');
+
+                return;
+            }
 
             $invoiceData = array_merge($this->invoiceForm, ['user_id' => Auth::id()]);
 
@@ -457,7 +467,18 @@ class InvoiceManagement extends Component
         $this->invoiceForm['tax_amount'] = $totalTax;
         $this->invoiceForm['discount_amount'] = $totalDiscount;
         $this->invoiceForm['grand_total'] = $subTotal - $totalDiscount + $totalTax;
-        $this->invoiceForm['balance'] = $this->invoiceForm['grand_total'];
+
+        // Calculate balance: grand_total - paid_amount
+        // Handle empty, null, or non-numeric values - default to 0
+        $paidAmount = 0;
+        if (isset($this->invoiceForm['paid_amount']) && $this->invoiceForm['paid_amount'] !== '' && $this->invoiceForm['paid_amount'] !== null) {
+            $paidAmount = floatval($this->invoiceForm['paid_amount']);
+        }
+
+        // Ensure paid amount is not negative and doesn't exceed grand total
+        $paidAmount = max(0, min($paidAmount, $this->invoiceForm['grand_total']));
+        $this->invoiceForm['paid_amount'] = $paidAmount;
+        $this->invoiceForm['balance'] = $this->invoiceForm['grand_total'] - $paidAmount;
     }
 
     public function updatedItems(): void
@@ -527,6 +548,7 @@ class InvoiceManagement extends Component
             'tax_amount' => 0,
             'discount_amount' => 0,
             'balance' => 0,
+            'paid_amount' => 0,
             'grand_total' => 0,
             'currency' => 'KSH',
             'status' => 'draft',
@@ -535,6 +557,25 @@ class InvoiceManagement extends Component
         ];
         $this->items = [];
         $this->selectedInvoice = null;
+    }
+
+    /**
+     * Listener for when paid_amount is updated to recalculate balance.
+     * Ensures empty values default to 0.
+     */
+    public function updatedInvoiceFormPaidAmount($value): void
+    {
+        // Handle empty string or null values - default to 0
+        if ($value === '' || $value === null) {
+            $this->invoiceForm['paid_amount'] = 0;
+        }
+
+        // Ensure non-negative values
+        if ($this->invoiceForm['paid_amount'] < 0) {
+            $this->invoiceForm['paid_amount'] = 0;
+        }
+
+        $this->calculateTotals();
     }
 
     protected function resetClientForm(): void
@@ -561,9 +602,9 @@ class InvoiceManagement extends Component
             ->where('user_id', Auth::id())
             ->when($this->searchTerm, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('invoice_number', 'like', '%' . $this->searchTerm . '%')
+                    $q->where('invoice_number', 'like', '%'.$this->searchTerm.'%')
                         ->orWhereHas('invoiceTo', function ($subq) {
-                            $subq->where('company_name', 'like', '%' . $this->searchTerm . '%');
+                            $subq->where('company_name', 'like', '%'.$this->searchTerm.'%');
                         });
                 });
             })
@@ -588,7 +629,7 @@ class InvoiceManagement extends Component
             session()->flash('success', 'Invoice PDF generated successfully!');
             $this->dispatch('pdf-generated', ['path' => $path, 'url' => $invoice->getPdfUrl()]);
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to generate PDF: ' . $e->getMessage());
+            session()->flash('error', 'Failed to generate PDF: '.$e->getMessage());
         }
     }
 
@@ -613,7 +654,7 @@ class InvoiceManagement extends Component
 
             return Storage::disk('public')->download($path, $filename);
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to download PDF: ' . $e->getMessage());
+            session()->flash('error', 'Failed to download PDF: '.$e->getMessage());
 
             return;
         }
@@ -629,7 +670,7 @@ class InvoiceManagement extends Component
             $path = $invoice->getOrGeneratePdf();
             $this->dispatch('view-pdf', ['url' => Storage::disk('public')->url($path)]);
         } catch (\Exception $e) {
-            session()->flash('error', 'Failed to view PDF: ' . $e->getMessage());
+            session()->flash('error', 'Failed to view PDF: '.$e->getMessage());
         }
     }
 }

@@ -42,6 +42,7 @@ class Invoice extends Model
         'tax_amount',
         'discount_amount',
         'balance',
+        'paid_amount',
         'grand_total',
         'currency',
         'status',
@@ -67,6 +68,7 @@ class Invoice extends Model
         'tax_amount' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'balance' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
         'grand_total' => 'decimal:2',
         'paid_at' => 'datetime',
         'document_generated_at' => 'datetime',
@@ -109,6 +111,7 @@ class Invoice extends Model
 
     /**
      * Calculate and update invoice totals based on items.
+     * Also recalculates balance based on paid_amount.
      */
     public function calculateTotals(): void
     {
@@ -121,26 +124,86 @@ class Invoice extends Model
         // Calculate grand total: sub_total + tax - discount
         $this->grand_total = $this->sub_total + $this->tax_amount - $this->discount_amount;
 
-        // Balance is typically the same as grand total for new invoices
-        if ($this->balance == 0) {
-            $this->balance = $this->grand_total;
-        }
+        // Calculate balance: grand_total - paid_amount
+        $this->balance = $this->grand_total - $this->paid_amount;
 
         $this->save();
     }
 
     /**
      * Mark invoice as paid.
+     * Sets paid_amount to grand_total and balance to 0.
      */
     public function markAsPaid(?string $paymentMethod = null, ?string $paymentReference = null): void
     {
         $this->update([
             'status' => 'paid',
+            'paid_amount' => $this->grand_total,
             'balance' => 0,
             'paid_at' => now(),
             'payment_method' => $paymentMethod,
             'payment_reference' => $paymentReference,
         ]);
+    }
+
+    /**
+     * Record a partial payment against the invoice.
+     * Updates paid_amount and recalculates balance.
+     */
+    public function recordPayment(float $amount, ?string $paymentMethod = null, ?string $paymentReference = null): void
+    {
+        if ($amount <= 0) {
+            throw new \InvalidArgumentException('Payment amount must be greater than zero.');
+        }
+
+        $newPaidAmount = $this->paid_amount + $amount;
+
+        if ($newPaidAmount > $this->grand_total) {
+            throw new \InvalidArgumentException('Payment amount exceeds outstanding balance.');
+        }
+
+        $this->paid_amount = $newPaidAmount;
+        $this->balance = $this->grand_total - $this->paid_amount;
+
+        // If fully paid, mark as paid
+        if ($this->balance <= 0) {
+            $this->status = 'paid';
+            $this->paid_at = now();
+        }
+
+        if ($paymentMethod) {
+            $this->payment_method = $paymentMethod;
+        }
+
+        if ($paymentReference) {
+            $this->payment_reference = $paymentReference;
+        }
+
+        $this->save();
+    }
+
+    /**
+     * Get the remaining balance after payments.
+     */
+    public function getRemainingBalanceAttribute(): float
+    {
+        return $this->grand_total - $this->paid_amount;
+    }
+
+    /**
+     * Check if invoice has partial payment.
+     */
+    public function hasPartialPayment(): bool
+    {
+        return $this->paid_amount > 0 && $this->paid_amount < $this->grand_total;
+    }
+
+    /**
+     * Check if invoice is fully paid.
+     */
+    public function isFullyPaid(): bool
+    {
+        return $this->paid_amount >= $this->grand_total;
     }
 
     /**
@@ -252,6 +315,8 @@ class Invoice extends Model
             $this->sub_total,
             $this->tax_amount,
             $this->discount_amount,
+            $this->paid_amount,
+            $this->balance,
             $this->grand_total,
             $this->status,
             $this->notes ?? '',

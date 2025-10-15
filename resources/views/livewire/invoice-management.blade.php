@@ -430,10 +430,46 @@
                                                         <div class="col-auto fw-bold">{{ $invoiceForm['currency'] }} {{ number_format($invoiceForm['tax_amount'], 2) }}</div>
                                                     </div>
                                                     <hr>
-                                                    <div class="row">
-                                                        <div class="col"><strong>Total:</strong></div>
+                                                    <div class="row mb-2">
+                                                        <div class="col"><strong>Grand Total:</strong></div>
                                                         <div class="col-auto"><strong>{{ $invoiceForm['currency'] }} {{ number_format($invoiceForm['grand_total'], 2) }}</strong></div>
                                                     </div>
+                                                    @if($modalMode !== 'view')
+                                                        <div class="row mb-2">
+                                                            <div class="col">
+                                                                <label class="form-label small mb-0">Paid Amount:</label>
+                                                            </div>
+                                                            <div class="col-auto">
+                                                                <input type="number" step="0.01" min="0"
+                                                                       max="{{ $invoiceForm['grand_total'] }}"
+                                                                       class="form-control form-control-sm text-end @error('invoiceForm.paid_amount') is-invalid @enderror"
+                                                                       style="width: 120px;"
+                                                                       wire:model.live="invoiceForm.paid_amount"
+                                                                       placeholder="0.00">
+                                                                @error('invoiceForm.paid_amount')
+                                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                                @enderror
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        @if($invoiceForm['paid_amount'] > 0)
+                                                            <div class="row mb-2">
+                                                                <div class="col">Paid Amount:</div>
+                                                                <div class="col-auto fw-bold text-success">-{{ $invoiceForm['currency'] }} {{ number_format($invoiceForm['paid_amount'], 2) }}</div>
+                                                            </div>
+                                                        @endif
+                                                    @endif
+                                                    @if($invoiceForm['paid_amount'] > 0)
+                                                        <hr>
+                                                        <div class="row">
+                                                            <div class="col"><strong>Balance Due:</strong></div>
+                                                            <div class="col-auto">
+                                                                <strong class="{{ $invoiceForm['balance'] > 0 ? 'text-danger' : 'text-success' }}">
+                                                                    {{ $invoiceForm['currency'] }} {{ number_format($invoiceForm['balance'], 2) }}
+                                                                </strong>
+                                                            </div>
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>

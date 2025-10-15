@@ -528,16 +528,22 @@
                             </td>
                         </tr>
                     @endif
-                    @if ($invoice->status !== 'paid')
-                        <tr>
-                            <td class="label">BALANCE</td>
-                            <td class="amount">{{ $invoice->currency }} {{ number_format($invoice->balance, 2) }}</td>
-                        </tr>
-                    @endif
                     <tr class="grand-total">
                         <td class="label">GRAND TOTAL</td>
                         <td class="amount">{{ $invoice->currency }} {{ number_format($invoice->grand_total, 2) }}</td>
                     </tr>
+                    @if ($invoice->paid_amount > 0)
+                        <tr style="background-color: #d4edda;">
+                            <td class="label" style="color: #155724;">PAID AMOUNT</td>
+                            <td class="amount" style="color: #155724;">-{{ $invoice->currency }} {{ number_format($invoice->paid_amount, 2) }}</td>
+                        </tr>
+                    @endif
+                    @if ($invoice->paid_amount > 0 && $invoice->balance > 0)
+                        <tr style="background-color: #fff3cd;">
+                            <td class="label" style="color: #856404;"><strong>BALANCE DUE</strong></td>
+                            <td class="amount" style="color: #856404;"><strong>{{ $invoice->currency }} {{ number_format($invoice->balance, 2) }}</strong></td>
+                        </tr>
+                    @endif
                 </table>
             </div>
         </div>
